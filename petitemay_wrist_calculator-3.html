@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>쁘띠메이 손목 사이즈 계산기</title>
+  <style>
+    body{font-family:Arial,'Noto Sans KR',sans-serif;background:#fbf7f2;color:#3b2a20;margin:0;padding:24px;}
+    .wrap{max-width:760px;margin:0 auto;background:#fff;border:1px solid #eadfd5;border-radius:18px;padding:26px;box-shadow:0 8px 24px rgba(90,55,30,.08)}
+    h1{text-align:center;color:#8a4b22;margin:10px 0 8px;font-size:30px}.sub{text-align:center;line-height:1.55;color:#6b5a50;margin-bottom:24px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.box{background:#fffaf6;border:1px solid #eadfd5;border-radius:14px;padding:16px;margin-bottom:14px}.label{font-weight:700;margin-bottom:8px}input,select{width:100%;padding:13px;border:1px solid #d8c8ba;border-radius:10px;font-size:16px;box-sizing:border-box;background:white}.gender{display:flex;gap:8px}.gender button,.fit button{flex:1;border:1px solid #d8c8ba;background:#fff;padding:13px;border-radius:10px;font-size:16px;cursor:pointer}.gender button.on,.fit button.on{background:#a86129;color:#fff;border-color:#a86129;font-weight:700}.fit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.result{text-align:center;border-top:2px solid #a86129;border-bottom:2px solid #a86129;padding:24px 0;margin:22px 0}.result small{display:block;color:#6b5a50;margin-bottom:8px}.result .num{font-size:48px;color:#9b5527;font-weight:800}.notice{background:#f6eadc;border-radius:12px;padding:16px;line-height:1.6}.btn{width:100%;background:#3b2a20;color:#fff;border:0;border-radius:12px;padding:15px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px}.muted{font-size:13px;color:#7b6b62;text-align:center;line-height:1.5;margin-top:14px}@media(max-width:640px){.grid{grid-template-columns:1fr}h1{font-size:25px}.result .num{font-size:42px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>쁘띠메이 손목 사이즈 계산기</h1>
+    <p class="sub">줄자가 없어도 괜찮아요.<br>성별, 키, 몸무게를 입력하면 예상 손목 둘레와 주문 추천 사이즈를 안내해드려요.</p>
+
+    <div class="grid">
+      <div class="box"><div class="label">1. 성별</div><div class="gender"><button id="female" class="on" onclick="setGender('female')">여성</button><button id="male" onclick="setGender('male')">남성</button></div></div>
+      <div class="box"><div class="label">2. 착용감</div><div class="fit"><button id="tight" onclick="setFit('tight')">타이트<br><small>딱 맞게</small></button><button id="normal" class="on" onclick="setFit('normal')">적당히<br><small>기본 추천</small></button><button id="loose" onclick="setFit('loose')">여유롭게<br><small>헐렁하게</small></button></div></div>
+      <div class="box"><div class="label">3. 키(cm)</div><input id="height" type="number" value="160" min="130" max="210" oninput="calc()"></div>
+      <div class="box"><div class="label">4. 몸무게(kg)</div><input id="weight" type="number" value="55" min="30" max="150" oninput="calc()"></div>
+    </div>
+
+    <div class="result">
+      <small>예상 손목 둘레</small>
+      <div><span class="num" id="wrist">15.5</span> cm</div>
+    </div>
+
+    <div class="notice" id="guide"></div>
+    <button class="btn" onclick="calc()">다시 계산하기</button>
+    <p class="muted">※ 계산 결과는 평균 신체 비율을 바탕으로 한 참고용입니다. 실제 손목 둘레와 약 ±1cm 차이가 있을 수 있습니다.<br>이미 잘 맞는 팔찌가 있다면 그 팔찌의 안쪽 둘레와 비슷한 값으로 주문하시는 것이 가장 정확합니다.</p>
+  </div>
+
+<script>
+let gender='female', fit='normal';
+function setGender(g){gender=g;document.getElementById('female').classList.toggle('on',g==='female');document.getElementById('male').classList.toggle('on',g==='male');calc();}
+function setFit(f){fit=f;['tight','normal','loose'].forEach(x=>document.getElementById(x).classList.toggle('on',x===f));calc();}
+function roundHalf(n){return Math.round(n*2)/2;}
+function calc(){
+  const h=parseFloat(document.getElementById('height').value)||160;
+  const w=parseFloat(document.getElementById('weight').value)||55;
+  let wrist;
+  if(gender==='female') wrist = 13.1 + (h-155)*0.025 + (w-45)*0.055;
+  else wrist = 15.0 + (h-170)*0.025 + (w-65)*0.055;
+  wrist=Math.min(Math.max(wrist,13),22);
+  wrist=roundHalf(wrist);
+  let add = fit==='tight'?1.0:(fit==='normal'?1.5:2.0);
+  let finished=roundHalf(wrist+add);
+  document.getElementById('wrist').textContent=wrist.toFixed(1);
+  document.getElementById('guide').innerHTML = `주문 시 <b>손목사이즈 ${wrist.toFixed(1)}cm</b>를 선택/입력해 주세요.<br>쁘띠메이는 원석 지름과 착용감을 고려해 실제 완성 팔찌를 약 <b>${finished.toFixed(1)}cm 내외</b>로 제작해드립니다.<br><br><b>정확도를 높이는 팁</b><br>종이나 끈으로 손목을 한 바퀴 감은 뒤, 겹치는 지점을 표시하고 자로 재면 더 정확합니다.`;
+}
+calc();
+</script>
+</body>
+</html>
