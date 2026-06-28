@@ -40,17 +40,17 @@
       </div>
       <div class="box">
         <div class="label">2. 키(cm)</div>
-        <input id="height" type="number" value="160" min="130" max="210" oninput="calc()">
+        <input id="height" type="number" value="" placeholder="000" min="130" max="210" oninput="calc()">
       </div>
       <div class="box">
         <div class="label">3. 몸무게(kg)</div>
-        <input id="weight" type="number" value="55" min="30" max="150" oninput="calc()">
+        <input id="weight" type="number" value="" placeholder="00" min="30" max="150" oninput="calc()">
       </div>
     </div>
 
     <div class="result">
       <small>예상 손목 둘레</small>
-      <div><span class="num" id="wrist">15.5</span> cm</div>
+      <div><span class="num" id="wrist">00.0</span> cm</div>
     </div>
 
     <div class="notice" id="guide"></div>
@@ -67,8 +67,17 @@ function setGender(g){
 }
 function roundHalf(n){return Math.round(n*2)/2;}
 function calc(){
-  const h=parseFloat(document.getElementById('height').value)||160;
-  const w=parseFloat(document.getElementById('weight').value)||55;
+  const heightValue = document.getElementById('height').value.trim();
+  const weightValue = document.getElementById('weight').value.trim();
+  const h = parseFloat(heightValue);
+  const w = parseFloat(weightValue);
+
+  if(!heightValue || !weightValue || isNaN(h) || isNaN(w)){
+    document.getElementById('wrist').textContent='00.0';
+    document.getElementById('guide').innerHTML = `키와 몸무게를 입력하면 예상 손목사이즈를 안내해 드립니다.<br><br><b>정확도를 높이는 팁</b><br>종이나 끈으로 손목을 한 바퀴 감은 뒤, 겹치는 지점을 표시하고 자로 재면 더 정확합니다.`;
+    return;
+  }
+
   let wrist;
   if(gender==='female') wrist = 13.1 + (h-155)*0.025 + (w-45)*0.055;
   else wrist = 15.0 + (h-170)*0.025 + (w-65)*0.055;
